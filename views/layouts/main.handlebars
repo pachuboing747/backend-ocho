@@ -20,15 +20,16 @@
             <li>
               <a href="/realTimesProducts">Real Times Products<span id="cart-badge" class="uk-label"></span></a>
             </li>
-            {{#if user}}
-              <li>
-                <a href="/chat">Chat<span id="cart-badge" class="uk-label"></span></a>
-              </li>
-            {{/if}}
-            <li>
+             <li>
               <a href="/products">Productos<span id="cart-badge" class="uk-label"></span></a>
             </li>
-              {{#if user}}
+            {{#if user}}
+              <li>
+                <a href="/chat">Chat</a>
+              </li>
+            {{/if}}
+            
+            {{#if user}}
               <li>
                 <a>Bienvenido, {{user.name}}!</a>
                 <div class="uk-navbar-dropdown">
@@ -52,9 +53,14 @@
                 <a href="/login">Inicia Sesion</a>
               </li>
             {{/if}}
+            
+          
           </ul>
         </div>
+     
       </nav>
+    </div>
+     
       <div class="uk-width-1-1 uk-margin-remove uk-align-center uk-text-break uk-padding">
         <h2 id="page-title">{{title}}</h2>
         {{{body}}}
@@ -66,10 +72,3 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.11.1/dist/js/uikit-icons.min.js"></script>
   </body>
 </html>
-
-
-
-
-
-
-

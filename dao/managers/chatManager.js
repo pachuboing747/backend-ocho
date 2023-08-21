@@ -1,5 +1,5 @@
 
-const chatModel = require ("../models/messages")
+const chatModel = require ("../models/messages.js")
 
 class ChatManager {
     getAll(){

@@ -11,6 +11,7 @@
   const cartRouter = require("./routes/api/Cart-router.js")
   const Routes = require("./routes/index.js");
   const socketManager = require ("./websocket/socketManager.js")
+  const userModel = require("./dao/models/userModel.js")
 
   try{
     
@@ -33,9 +34,25 @@
   app.use("/public", express.static(path.join(__dirname + "/public")));
   app.use(cookieParser());
 
-  app.use((req, res, next)=>{
-    next()
-  })
+  app.use(async (req, res, next) => {
+    const { user } = req.cookies;
+    const userDoc = await userModel.findOne({ email: user });
+  
+    if (userDoc && userDoc.role === 'Admin') {
+      req.user = {
+        name: user,
+        isAdmin: true,
+      };
+    } else {
+      req.user = {
+        name: user,
+        isAdmin: false,
+      };
+    }
+    
+    next();
+  });
+  
   
   app.use("/", Routes.home);
   

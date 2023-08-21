@@ -17,7 +17,8 @@
   },
   "scripts": {
     "start:express": "nodemon app.js",
-    "seed:products": "node ./scripts/seed.productos.js"
+    "seed:products": "node ./scripts/seed.productos.js",
+    "seed:user": "node ./scripts/seed.user.js"
   },
   "keywords": [],
   "author": "",

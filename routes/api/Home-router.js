@@ -2,6 +2,7 @@ const {Router} = require ("express");
 const productManager =require("../../dao/managers/ProductManager.js")
 const cartsManager = require ("../../dao/managers/CartsManager.js")
 const auth = require("../../midlewares/auth.js")
+const userModel = require("../../dao/models/userModel.js")
 
 const router = Router()
 
@@ -34,6 +35,10 @@ router.get("/", async (req, res) => {
     title: "Productos",
     products: filteredProducts,
     pageInfo,
+    user: req.user ?  {
+      ...req.user,
+      isAdmin: req.user?.role == 'admin',
+    } : null,
     style: "home"
   });
     
@@ -101,13 +106,34 @@ router.get("/products", async (req, res) => {
 
 router.get('/login', (_, res) => res.render('login'))
 
-router.post('/login', (req, res) => {
-  const {user} = req.body;
-  res.cookie('user', user);
-  console.log(req.body)
+// router.post('/login', async  (req, res) => {
+//   const {user} = req.body;
+//   console.log('User:', user); 
+//  res.cookie("user", user).redirect("/")
+// });
 
-  res.redirect('/')
-})
+router.post('/login', async (req, res) => {
+  const { user } = req.body;
+  console.log('User:', user);
+
+  try {
+    const userDoc = await userModel.findOne({ email: user });
+
+    if (userDoc) {
+      res.cookie('user', user);
+      res.redirect('/');
+    } else {
+      console.log('Usuario no encontrado');
+      res.redirect('/login');
+    }
+  } catch (error) {
+    console.error('Error al verificar el usuario:', error);
+    res.redirect('/login');
+  }
+});
+
+
+
 
 
 router.get('/logout', auth, (req, res) => {
@@ -116,25 +142,22 @@ router.get('/logout', auth, (req, res) => {
  
   res.clearCookie('user')
 
-  req.session.destroy((err) => {
-    if(err) {
-      return res.redirect('/error')
-    }
+  // req.session.destroy((err) => {
+  //   if(err) {
+  //     return res.redirect('/error')
+  //   }
 
-    res.render('logout', {
-      user: req.user.name
-    })
+  //   res.render('logout', {
+  //     user: req.user.name
+  //   })
 
-    req.user = null
-  })
-
-  // res.render('logout', {
-  //   user
+  //   req.user = null
   // })
+
+  res.render('logout', {
+    user
+  })
 })
 
-
-
-  
 
 module.exports = router;
