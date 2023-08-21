@@ -36,35 +36,18 @@ const appendUserActionElement = (user, joined) => {
   }, 250)
 }
 
-let correoDelUsuario = null
+let username = null
 let currentMessages = []
 
 socket.on('chat-messages', (messagesList) => {
   currentMessages = messagesList
 })
 
-Swal.fire({
-  title: 'Ingresa tu email',
-  input: 'email',
-  inputAttributes: {
-    autocapitalize: 'off'
-  },
-  confirmButtonText: 'Enviar',
-  preConfirm: (correoDelUsuario) => {
-    if (!correoDelUsuario) {
-      Swal.showValidationMessage(
-        `El usuario no puede estar en blanco`
-      )
-      return
-    }
-    
-    return correoDelUsuario
-  },
-  allowOutsideClick: false
-}).then(({ value }) => {
-  correoDelUsuario = value
-  socket.emit('user', { user: correoDelUsuario, action: true })
+const cookies = parseCookies()
 
+if(cookies.user){
+  username = cookies.user
+  socket.emit("user", {user: username, action: true})
 
   for (const { user, datetime, text } of currentMessages) {
     appendMessageElement(user, datetime, text)
@@ -92,10 +75,23 @@ Swal.fire({
 
     const fecha = new Date()
 
-    const msg = { user: correoDelUsuario, datetime: fecha.toLocaleTimeString('en-US'), text: value }
+    const msg = { user: username, datetime: fecha.toLocaleTimeString('en-US'), text: value }
 
     socket.emit('chat-message', msg)
     target.value = ""
-    appendMessageElement(correoDelUsuario, fecha.toLocaleTimeString('en-US'), value)
+    appendMessageElement(username, fecha.toLocaleTimeString('en-US'), value)
   })
-})
+}
+
+
+function parseCookies() {
+  return document.cookie
+    .split(';')
+    .reduce((obj, cookie) => {
+      const keyValue = cookie.split('=')
+      return {
+        ...obj,
+        [keyValue[0].trim()]: keyValue[1]
+      }
+    }, {})
+}

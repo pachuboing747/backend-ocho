@@ -106,57 +106,54 @@ router.get("/products", async (req, res) => {
 
 router.get('/login', (_, res) => res.render('login'))
 
-// router.post('/login', async  (req, res) => {
-//   const {user} = req.body;
-//   console.log('User:', user); 
-//  res.cookie("user", user).redirect("/")
-// });
-
 router.post('/login', async (req, res) => {
   const { user } = req.body;
-  console.log('User:', user);
 
-  try {
-    const userDoc = await userModel.findOne({ email: user });
-
-    if (userDoc) {
-      res.cookie('user', user);
-      res.redirect('/');
-    } else {
-      console.log('Usuario no encontrado');
-      res.redirect('/login');
-    }
-  } catch (error) {
-    console.error('Error al verificar el usuario:', error);
-    res.redirect('/login');
+  req.session.user = {
+    name: user
   }
+
+  res.redirect("/")
+  // console.log('User:', user);
+
+  // try {
+  //   const userDoc = await userModel.findOne({  firstname: user });
+
+  //   if (userDoc) {
+  //     res
+  //     .cookie('user', user)
+  //     .cookie("key", "password", {signed: true})
+  //     .redirect('/')
+  //   } else {
+  //     console.log('Usuario no encontrado');
+  //     res.redirect('/login');
+  //   }
+  // } catch (error) {
+  //   console.error('Error al verificar el usuario:', error);
+  //   res.redirect('/login');
+  // }
 });
-
-
-
-
 
 router.get('/logout', auth, (req, res) => {
   const { user } = req.cookies
 
- 
   res.clearCookie('user')
 
-  // req.session.destroy((err) => {
-  //   if(err) {
-  //     return res.redirect('/error')
-  //   }
+  req.session.destroy((err) => {
+    if(err) {
+      return res.redirect('/error')
+    }
 
-  //   res.render('logout', {
-  //     user: req.user.name
-  //   })
+    res.render('logout', {
+      user: req.user.name
+    })
 
-  //   req.user = null
-  // })
-
-  res.render('logout', {
-    user
+    req.user = null
   })
+
+  // res.render('logout', {
+  //   user
+  // })
 })
 
 

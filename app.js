@@ -6,12 +6,12 @@
   const { Server } = require("socket.io");
   const mongoose = require ("mongoose")
   const cookieParser = require("cookie-parser");
-  // const session = require("express-session");
+  const session = require("express-session");
 
   const cartRouter = require("./routes/api/Cart-router.js")
   const Routes = require("./routes/index.js");
   const socketManager = require ("./websocket/socketManager.js")
-  const userModel = require("./dao/models/userModel.js")
+ 
 
   try{
     
@@ -32,27 +32,28 @@
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use("/public", express.static(path.join(__dirname + "/public")));
-  app.use(cookieParser());
+  app.use(cookieParser("esunsecreto"));
+  app.use(session({
+    secret: "esunsecreto",
+    resave: true,
+    saveUninitialized: true
+  }))
 
   app.use(async (req, res, next) => {
-    const { user } = req.cookies;
-    const userDoc = await userModel.findOne({ email: user });
   
-    if (userDoc && userDoc.role === 'Admin') {
+    console.log(req.session)
+    
+    // const { user } = req.cookies;
+  
+    if (req.session?.user){
       req.user = {
-        name: user,
-        isAdmin: true,
-      };
-    } else {
-      req.user = {
-        name: user,
-        isAdmin: false,
-      };
+        name: req.session.user.name,
+        role: "admin"
+      }
     }
     
     next();
   });
-  
   
   app.use("/", Routes.home);
   
