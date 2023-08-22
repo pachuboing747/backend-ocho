@@ -11,7 +11,8 @@
       <nav id="navbar" class="uk-navbar-container" uk-navbar>
         <div class="uk-navbar-left">
           <ul class="uk-navbar-nav">
-            <li class="uk-active">
+            {{#if user}}
+             <li class="uk-active">
               <a href="/">Home</a>
             </li>
             <li>
@@ -23,15 +24,9 @@
              <li>
               <a href="/products">Productos<span id="cart-badge" class="uk-label"></span></a>
             </li>
-             
-            <a></a>
-            {{#if user}}
-              <li>
+             <li>
                 <a href="/chat">Chat</a>
               </li>
-            {{/if}}
-            
-            {{#if user}}
               <li>
                 <a>Bienvenido, {{user.name}}!</a>
                 <div class="uk-navbar-dropdown">

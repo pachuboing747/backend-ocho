@@ -37,7 +37,7 @@ router.get("/", async (req, res) => {
     pageInfo,
     user: req.user ?  {
       ...req.user,
-      isAdmin: req.user?.role === 'Admin',
+      isAdmin: req.user?.role === 'admin',
     } : null,
     style: "home"
   });
@@ -68,7 +68,7 @@ router.get("/realTimesProducts", async(req, res)=>{
     
 })
 
-router.get("/chat", (req, res)=>{
+router.get("/chat", auth,(req, res)=>{
     res.render("chat",{
         title: "Chat",
         style:"home"

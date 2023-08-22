@@ -45,12 +45,10 @@
 
   app.use(async (req, res, next) => {
   
-    console.log(req.session)
-  
     if (req.session?.user){
       req.user = {
         name: req.session.user.name,
-        role: "Admin"
+        role: req.session.user.role,
       }
     }
     
