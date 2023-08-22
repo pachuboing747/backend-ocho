@@ -7,6 +7,7 @@
   const mongoose = require ("mongoose")
   const cookieParser = require("cookie-parser");
   const session = require("express-session");
+  const fileStore = require("session-file-store")
 
   const cartRouter = require("./routes/api/Cart-router.js")
   const Routes = require("./routes/index.js");
@@ -24,7 +25,8 @@
   const app = express(); 
   const server = http.createServer(app);
   const io = new Server(server);
-  
+  const FileStore = fileStore(session)
+
   app.engine("handlebars", handlebars.engine());
   app.set("views", path.join(__dirname, "/views"));
   app.set("view engine", "handlebars");
@@ -33,22 +35,22 @@
   app.use(express.json());
   app.use("/public", express.static(path.join(__dirname + "/public")));
   app.use(cookieParser("esunsecreto"));
+
   app.use(session({
     secret: "esunsecreto",
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: new FileStore({path:"./sessions", ttl: 100, retries: 0})
   }))
 
   app.use(async (req, res, next) => {
   
     console.log(req.session)
-    
-    // const { user } = req.cookies;
   
     if (req.session?.user){
       req.user = {
         name: req.session.user.name,
-        role: "admin"
+        role: "Admin"
       }
     }
     

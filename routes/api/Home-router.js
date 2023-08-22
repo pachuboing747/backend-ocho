@@ -1,8 +1,8 @@
 const {Router} = require ("express");
 const productManager =require("../../dao/managers/ProductManager.js")
 const cartsManager = require ("../../dao/managers/CartsManager.js")
+const userManager = require ("../../dao/managers/userManager.js")
 const auth = require("../../midlewares/auth.js")
-const userModel = require("../../dao/models/userModel.js")
 
 const router = Router()
 
@@ -37,7 +37,7 @@ router.get("/", async (req, res) => {
     pageInfo,
     user: req.user ?  {
       ...req.user,
-      isAdmin: req.user?.role == 'admin',
+      isAdmin: req.user?.role === 'Admin',
     } : null,
     style: "home"
   });
@@ -107,35 +107,35 @@ router.get("/products", async (req, res) => {
 router.get('/login', (_, res) => res.render('login'))
 
 router.post('/login', async (req, res) => {
-  const { user } = req.body;
+  const { email } = req.body
 
-  req.session.user = {
-    name: user
+  try {
+
+    const user = await userManager.getByEmail(email)
+
+    if (!user) {
+      return res.render('login', { error: 'El usuario no existe' })
+    }
+
+    req.session.user = {
+      name: user.firstname,
+      id: user._id,
+
+      ...user
+    }
+
+    req.session.save((err) => {
+      if(!err) {
+        res.redirect('/')
+      }
+    })
+  } catch(e) {
+    res.render('login', { error: 'Ha ocurrido un error' })
   }
-
-  res.redirect("/")
-  // console.log('User:', user);
-
-  // try {
-  //   const userDoc = await userModel.findOne({  firstname: user });
-
-  //   if (userDoc) {
-  //     res
-  //     .cookie('user', user)
-  //     .cookie("key", "password", {signed: true})
-  //     .redirect('/')
-  //   } else {
-  //     console.log('Usuario no encontrado');
-  //     res.redirect('/login');
-  //   }
-  // } catch (error) {
-  //   console.error('Error al verificar el usuario:', error);
-  //   res.redirect('/login');
-  // }
-});
+  
+})
 
 router.get('/logout', auth, (req, res) => {
-  const { user } = req.cookies
 
   res.clearCookie('user')
 
@@ -151,10 +151,48 @@ router.get('/logout', auth, (req, res) => {
     req.user = null
   })
 
-  // res.render('logout', {
-  //   user
-  // })
 })
 
+router.get("/profile", auth, (req,res)=>{
+  res.render("profile",{
+    ...req.session.user
+  })
+})
+
+router.get('/signup', (_, res) => res.render('signup'))
+router.post('/signup', async (req, res) => {
+  const user = req.body
+  
+  console.log(user)
+
+  const existing = await userManager.getByEmail(user.email)
+
+  if (existing) {
+    return res.render('signup', {
+      error: 'El email ya existe'
+    })
+  }
+
+  try {
+    const newUser = await userManager.create(user)
+
+    req.session.user = {
+      name: newUser.firstname,
+      id: newUser._id,
+      ...newUser._doc
+    }
+
+    console.log(req.session)
+
+    req.session.save((err) => {
+      res.redirect('/')
+    })
+
+  } catch(e) {
+    return res.render('signup', {
+      error: 'Ocurrio un error. Intentalo mas tarde'
+    })
+  }
+})
 
 module.exports = router;

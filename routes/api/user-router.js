@@ -1,8 +1,7 @@
 const { Router } = require('express')
-const UserManager = require('../../dao/managers/userManager.js')
 
 const router = Router()
-const manager = new UserManager('users.json')
+const manager = require('../../dao/managers/userManager.js')
 
 router.post('/', async (req, res) => {
   const { body } =  req

@@ -7,4 +7,4 @@ function auth(req, res, next) {
     res.redirect('/login')
   }
   
-  module.exports = auth
+module.exports = auth
