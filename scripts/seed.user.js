@@ -23,11 +23,30 @@ const mongoose = require('mongoose')
 
 // console.log(usersRecords)
 
+// function generateUser(count) {
+//   const users = [];
+
+//   for (let i = 0; i < count; i++) {
+//     const firstname = "coder";
+//     const lastname = "house";
+//     const email = "adminCoder@coder.com";
+//     password = "adminCod3r123";
+//     const role = "Admin";
+//     const gender = "male";
+
+//     users.push({ firstname, lastname, email,password,role, gender  });
+//   }
+
+//   return users;
+// }
+
+// const usersRecords = generateUser();
+
 async function main() {
     await mongoose.connect("mongodb+srv://pachu1982721:VPXombCDAVDvOaVQ@cluster0.lvefot0.mongodb.net/ecommerce?retryWrites=true&w=majority")
-//   const result = await userModel.insertMany(usersRecords)
+  // const result = await userModel.insertMany(usersRecords)
 
-  const result = await userModel.find({ lastname: "Grant" }).explain("executionStats")
+  const result = await userModel.find({ email: "adminCoder@coder.com" }).explain("executionStats")
 
   console.log(result)
 

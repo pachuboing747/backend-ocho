@@ -7,7 +7,6 @@ const schema = new Schema({
   password: String,
   role: String,
   gender: String,
-  createdDate: { type: Number, default: Date.now() },
   isAdmin: { type: Boolean, default: false }
 })
 
